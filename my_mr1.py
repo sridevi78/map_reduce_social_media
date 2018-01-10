@@ -18,11 +18,17 @@ class SecondStep(MRJob):
         #print hp.nlargest(100,self.heap1)
         yield ('key',(hp.nlargest(100,self.heap1)))
         #yield ('key',self.heap1)
+        
+class ThirdStep(MRJob):
+    def reducer(self,key,items):
+        self.com_heap=[]
+        for item in items:
+            hp.heappush(self.com_heap,item)
+        yield ('key2',hp.nlargest(100,self.com_heap))        
 
 class SteppedJob(MRJob):
     def steps(self):
-        return FirstStep().steps()+SecondStep().steps()
-    
+        return FirstStep().steps()+SecondStep().steps()+ThirdStep().steps()
+
 if __name__ == '__main__':
     SteppedJob.run()
-       
